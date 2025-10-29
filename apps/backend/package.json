@@ -1,0 +1,31 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"description": "The backend of the TODO List project for SOFE-2800U",
+	"license": "ISC",
+	"author": "",
+	"main": "dist/index.js",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"clean": "del /s /q dist",
+		"build": "tsc",
+		"start": " npm run clean && npm run build && node .",
+		"startNoClean": "npm run build & node ."
+	},
+	"devDependencies": {
+		"@types/cookie-parser": "^1.4.10",
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.5",
+		"@types/jsonwebtoken": "^9.0.10",
+		"@types/node": "^24.9.2",
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.5",
+		"dotenv": "^17.2.3",
+		"express": "^5.1.0",
+		"jsonwebtoken": "^9.0.2"
+	}
+}
