@@ -14,12 +14,12 @@
 
 @theme {
 	/* Colours to be determined */
-	--color-lightPrimary: ;
-	--color-lightSecondary:;
-	--color-darkPrimary:;
-	--color-darkSecondary:;
+	--color-lightPrimary: #FAF3DD;
+	--color-lightSecondary: #C8D5B9;
+	--color-darkPrimary: #272838;
+	--color-darkSecondary: #BFB1C1;
 	--color-accent:;
-	--color-lightText:;
+	--color-lightText: #272838 ;
 	--color-darkText:;
 	--color-lightTextMuted:;
 	--color-darkTextMuted:;
