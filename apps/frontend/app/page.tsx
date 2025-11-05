@@ -1,13 +1,18 @@
 import SessionDropdown from "./components/Header/SessionDropdown";
+import ThemeToggler from "./components/Header/ThemeToggler";
 
 // This is the landing page for the TODO List
 export default function Home() {
 	return (
 		<div className="flex flex-col h-dvh justify-between text-black ">
-			<header className=" bg-lightSecondary flex flex-row justify-end border-b-accent border-b-2">
+			<header className=" relative bg-lightSecondary flex flex-row justify-end gap-6 dark:bg-darkSecondary border-b-accent border-b-2 transition-colors duration-500">
+				<div className="absolute -top-0.5 left-4">
+					<ThemeToggler />
+				</div>
+
 				<SessionDropdown />
 			</header>
-			<main className="mb-auto h-full bg-lightPrimary">
+			<main className="mb-auto h-full bg-lightPrimary dark:bg-darkPrimary transition-colors duration-500">
 				<div className="flex flex-col items-center justify-center">
 					<h1 className="font-bold text-lightText text-5xl sm:text-6xl md:text-8xl lg:text-9xl mt-20 sm:mt-25 md:mt-25 lg:mt-40">
 						Tick-It
@@ -17,7 +22,7 @@ export default function Home() {
 					</h2>
 				</div>
 			</main>
-			<footer className="bg-lightSecondary  flex flex-col">
+			<footer className="bg-lightSecondary dark:bg-darkSecondary flex flex-col transition-colors duration-500">
 				<div className="place-self-center">
 					<p> Tick-It &copy; 2025</p>
 				</div>
