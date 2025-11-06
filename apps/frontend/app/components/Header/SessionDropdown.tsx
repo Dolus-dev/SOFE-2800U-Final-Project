@@ -1,6 +1,6 @@
 "use client";
 
-import { useOutsideClick } from "@/app/lib/handleOutsideClick";
+import useOutsideClick from "@/app/lib/useOutsideClick";
 import {
 	ArrowLeftStartOnRectangleIcon,
 	ChevronDownIcon,
@@ -8,7 +8,7 @@ import {
 	UserCircleIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 // TODO: Change output depending on whether is logged in based on fetch call
 // Above could be handled either in parent page or locally here
