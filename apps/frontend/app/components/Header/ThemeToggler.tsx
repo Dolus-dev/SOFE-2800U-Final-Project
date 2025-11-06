@@ -1,6 +1,6 @@
 "use client";
 
-import { toggleTheme } from "@/app/lib/updateTheme";
+import toggleTheme from "@/app/lib/updateTheme";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 
 export default function ThemeToggler() {

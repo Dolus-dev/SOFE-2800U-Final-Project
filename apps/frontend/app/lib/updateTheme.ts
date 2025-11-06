@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { Theme } from "./types/enums";
 
-export async function toggleTheme() {
+export default async function toggleTheme() {
 	const cookieStore = await cookies();
 
 	const themeCookieExists = cookieStore.has("theme");
