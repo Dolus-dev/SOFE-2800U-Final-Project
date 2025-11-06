@@ -29,6 +29,7 @@ async function startServer() {
 			console.info(`API service is running on http://localhost:${PORT}`);
 		});
 	} catch (error) {
+		console.error(error);
 		process.exit();
 	}
 }
