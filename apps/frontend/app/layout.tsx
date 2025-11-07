@@ -23,8 +23,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
 	children,
+	auth,
 }: Readonly<{
 	children: React.ReactNode;
+	auth: React.ReactNode;
 }>) {
 	const cookieStore = await cookies();
 	let theme: Theme = Theme.Light;
@@ -39,8 +41,9 @@ export default async function RootLayout({
 			className="scroll-smooth "
 			data-theme={`${theme === Theme.Light ? "" : "dark"}`}>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				{children}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
+				{auth}
+				<main>{children}</main>
 			</body>
 		</html>
 	);

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SessionDropdown from "./components/Header/SessionDropdown";
 import ThemeToggler from "./components/Header/ThemeToggler";
 
@@ -9,7 +10,9 @@ export default function Home() {
 				<div className="absolute -top-0.5 left-4">
 					<ThemeToggler />
 				</div>
-
+				<Link
+					href={"/login"}
+					className="p-4 bg-green-600"></Link>
 				<SessionDropdown />
 			</header>
 			<main className="mb-auto h-full bg-lightPrimary dark:bg-darkPrimary transition-colors duration-500">
