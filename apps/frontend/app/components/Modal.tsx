@@ -22,7 +22,7 @@ const modalVariants = {
 };
 
 /**
- * A re-usable modal component
+ * A re-usable modal container
  * @param isOpen initial boolean value of whether the modal should be displayed or not
  * @param onClose Callback function
  * @param children Children of this container

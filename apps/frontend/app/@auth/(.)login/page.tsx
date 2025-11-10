@@ -7,6 +7,8 @@ export default function Page() {
 	const router = useRouter();
 
 	const [isOpen, setIsOpen] = useState(true);
+
+	// This is an example. All modal layout must be contained within the Modal component
 	return (
 		<Modal
 			isOpen={isOpen}
