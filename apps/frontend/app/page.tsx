@@ -1,6 +1,16 @@
 import Link from "next/link";
 import SessionDropdown from "./components/Header/SessionDropdown";
 import ThemeToggler from "./components/Header/ThemeToggler";
+import { cookies } from "next/headers";
+import { Theme } from "./lib/types/enums";
+
+const cookieStore = await cookies();
+const themeCookieExists = cookieStore.has("theme");
+let currentTheme: Theme;
+
+if (themeCookieExists) {
+	currentTheme = cookieStore.get("theme")?.value as Theme;
+} else currentTheme = Theme.Light;
 
 // This is the landing page for the TODO List
 export default function Home() {
@@ -8,7 +18,7 @@ export default function Home() {
 		<div className="flex flex-col h-dvh justify-between text-black ">
 			<header className=" relative bg-lightSecondary flex flex-row justify-end gap-6 dark:bg-darkSecondary border-b-accent border-b-2 transition-colors duration-500">
 				<div className="absolute -top-1 left-4">
-					<ThemeToggler />
+					<ThemeToggler currentTheme={currentTheme} />
 				</div>
 				<Link
 					href={"/login"}
