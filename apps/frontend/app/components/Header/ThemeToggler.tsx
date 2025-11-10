@@ -3,7 +3,7 @@
 import { Theme } from "@/app/lib/types/enums";
 import toggleTheme from "@/app/lib/updateTheme";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
-import { AnimatePresence, easeInOut, motion, spring } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 const motionProps = {
@@ -21,8 +21,13 @@ const motionProps = {
 	transition: { duration: 0.5 },
 };
 
+/**
+ * Button that toggles between Light and Dark modes
+ * @param currentTheme The current theme that is stored in the Theme cookie. Default is Light mode
+ * @returns
+ */
 export default function ThemeToggler({
-	currentTheme,
+	currentTheme = Theme.Light,
 }: {
 	currentTheme: Theme;
 }) {

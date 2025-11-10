@@ -13,6 +13,10 @@ import { useState } from "react";
 // TODO: Change output depending on whether is logged in based on fetch call
 // Above could be handled either in parent page or locally here
 
+/**
+ * Dropdown component that displays basic user information and houses other account related navigation links
+ * @returns
+ */
 export default function SessionDropdown() {
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useOutsideClick(() => {

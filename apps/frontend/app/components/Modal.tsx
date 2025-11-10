@@ -21,6 +21,17 @@ const modalVariants = {
 	},
 };
 
+/**
+ * A re-usable modal component
+ * @param isOpen initial boolean value of whether the modal should be displayed or not
+ * @param onClose Callback function
+ * @param children Children of this container
+ * @example <Modal isOpen={true}
+ * onClose={() => {setIsOpen(false) router.back()} >
+ * {children}
+ * </ Modal>
+ * @returns
+ */
 export default function Modal({
 	isOpen,
 	onClose,

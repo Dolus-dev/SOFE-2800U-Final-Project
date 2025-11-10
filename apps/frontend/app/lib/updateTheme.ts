@@ -3,6 +3,9 @@
 import { cookies } from "next/headers";
 import { Theme } from "./types/enums";
 
+/**
+ * Toggles the theme that is displayed to the user (Light/Dark)
+ */
 export default async function toggleTheme() {
 	const cookieStore = await cookies();
 
