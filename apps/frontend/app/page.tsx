@@ -7,12 +7,14 @@ export default function Home() {
 	return (
 		<div className="flex flex-col h-dvh justify-between text-black ">
 			<header className=" relative bg-lightSecondary flex flex-row justify-end gap-6 dark:bg-darkSecondary border-b-accent border-b-2 transition-colors duration-500">
-				<div className="absolute -top-0.5 left-4">
+				<div className="absolute -top-1 left-4">
 					<ThemeToggler />
 				</div>
 				<Link
 					href={"/login"}
-					className="p-4 bg-green-600"></Link>
+					className="py-3">
+					Login
+				</Link>
 				<SessionDropdown />
 			</header>
 			<main className="mb-auto h-full bg-lightPrimary dark:bg-darkPrimary transition-colors duration-500">
