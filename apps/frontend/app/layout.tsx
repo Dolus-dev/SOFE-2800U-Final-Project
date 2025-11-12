@@ -42,6 +42,7 @@ export default async function RootLayout({
 		<html
 			lang="en"
 			className="scroll-smooth "
+			data-scroll-behavior="smooth"
 			data-theme={`${theme === Theme.Light ? "" : "dark"}`}>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
