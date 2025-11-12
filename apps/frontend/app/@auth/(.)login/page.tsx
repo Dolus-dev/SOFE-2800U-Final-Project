@@ -19,7 +19,7 @@ export default function Page() {
 				}, 500);
 			}}>
 			<header className="absolute top-0 left-0 bg-lightSecondary py-2 dark:bg-darkSecondary w-full ">
-				<h2 className="text-lightText dark:text-darkText font-semibold ml-4">
+				<h2 className="text-lightText  font-semibold ml-4">
 					Sign into or create your account
 				</h2>
 			</header>
