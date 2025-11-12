@@ -23,12 +23,5 @@ export default async function ThemeToggler({}) {
 		<>
 			<ThemeIcon currentTheme={activeTheme} />
 		</>
-
-		// <button
-		// 	onClick={() => toggleTheme()}
-		// 	className="hover: cursor-pointer">
-		// 	<SunIcon className=" absolute size-6 text-white  dark:opacity-0 transition-all duration-500" />
-		// 	<MoonIcon className=" absolute size-6 text-white  opacity-0 dark:block dark:opacity-100 transition-all duration-500" />
-		// </button>
 	);
 }
