@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cookies } from "next/headers";
 import { Theme } from "./lib/types/enums";
+import isValidTheme from "./lib/validateTheme";
 
 /** Fonts to be chosen later */
 
@@ -32,7 +33,9 @@ export default async function RootLayout({
 	let theme: Theme = Theme.Light;
 
 	if (cookieStore.has("theme")) {
-		theme = cookieStore.get("theme")?.value as Theme;
+		const storedTheme = cookieStore.get("theme")?.value;
+		if (!isValidTheme(storedTheme)) theme = Theme.Light;
+		else theme = storedTheme;
 	}
 
 	return (

@@ -4,6 +4,7 @@ import { Theme } from "@/app/lib/types/enums";
 
 import ThemeIcon from "./ThemeTogglerIcon";
 import { cookies } from "next/headers";
+import isValidTheme from "@/app/lib/validateTheme";
 
 /**
  * Button that toggles between Light and Dark modes
@@ -16,7 +17,10 @@ export default async function ThemeToggler({}) {
 	let activeTheme: Theme;
 
 	if (cookieStore.has("theme")) {
-		activeTheme = cookieStore.get("theme")?.value as Theme;
+		const themeCookieValue = cookieStore.get("theme")?.value;
+
+		if (isValidTheme(themeCookieValue)) activeTheme = themeCookieValue;
+		else activeTheme = Theme.Light;
 	} else activeTheme = Theme.Light;
 
 	return (

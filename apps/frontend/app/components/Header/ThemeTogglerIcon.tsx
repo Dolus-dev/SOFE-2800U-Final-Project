@@ -4,7 +4,6 @@ import { Theme } from "@/app/lib/types/enums";
 import toggleTheme from "@/app/lib/updateTheme";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
 
 export default function ThemeIcon({ currentTheme }: { currentTheme: Theme }) {
 	const motionProps = {
@@ -22,15 +21,12 @@ export default function ThemeIcon({ currentTheme }: { currentTheme: Theme }) {
 		transition: { duration: 0.5 },
 	};
 
-	const [theme, setCurrentTheme] = useState(currentTheme);
-	console.log(theme);
 	return (
 		<>
-			{theme === Theme.Light && (
+			{currentTheme === Theme.Light && (
 				<motion.button
 					className="hover: cursor-pointer"
 					onClick={() => {
-						setCurrentTheme(Theme.Dark);
 						toggleTheme();
 					}}
 					whileTap={{ scale: 0.95 }}>
@@ -42,11 +38,10 @@ export default function ThemeIcon({ currentTheme }: { currentTheme: Theme }) {
 				</motion.button>
 			)}
 
-			{theme === Theme.Dark && (
+			{currentTheme === Theme.Dark && (
 				<motion.button
 					className="hover: cursor-pointer"
 					onClick={() => {
-						setCurrentTheme(Theme.Light);
 						toggleTheme();
 					}}
 					whileTap={{ scale: 0.95 }}>
