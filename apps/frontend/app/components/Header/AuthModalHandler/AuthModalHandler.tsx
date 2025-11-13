@@ -2,22 +2,25 @@
 
 import { useState } from "react";
 import Modal from "../../Modal";
+import { motion } from "motion/react";
 
 export default function AuthModalHandler() {
 	const [modalType, setModalType] = useState<"login" | "signup" | null>(null);
 
 	return (
 		<>
-			<button
+			<motion.button
 				onClick={() => setModalType("login")}
-				className="py-3">
+				className="py-3 hover:cursor-pointer transition-colors duration-500 font-semibold hover:text-lightTextMuted active:text-lightTextMuted "
+				whileTap={{ scale: 0.95 }}>
 				Login
-			</button>
-			<button
+			</motion.button>
+			<motion.button
 				onClick={() => setModalType("signup")}
-				className="py-3 hover:cursor-pointer">
+				className="py-3 hover:cursor-pointer font-semibold transition-colors duration-500 hover:text-lightTextMuted active:text-lightTextMuted "
+				whileTap={{ scale: 0.95 }}>
 				Signup
-			</button>
+			</motion.button>
 
 			<Modal
 				isOpen={modalType == "login"}
@@ -40,9 +43,7 @@ export default function AuthModalHandler() {
 
 			<Modal
 				isOpen={modalType === "signup"}
-				onClose={() => {
-					setTimeout(() => setModalType(null), 500);
-				}}>
+				onClose={() => setModalType(null)}>
 				<header className="absolute top-0 left-0 bg-lightSecondary py-2 dark:bg-darkSecondary w-full ">
 					<h2 className="text-lightText  font-semibold ml-4">
 						create your account
