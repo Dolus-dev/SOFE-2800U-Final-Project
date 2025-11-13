@@ -22,6 +22,7 @@ export default function AuthModalHandler() {
 				Signup
 			</motion.button>
 
+			{/**TODO: Replace content with login form*/}
 			<Modal
 				isOpen={modalType == "login"}
 				onClose={() => {
@@ -41,6 +42,7 @@ export default function AuthModalHandler() {
 				</main>
 			</Modal>
 
+			{/**TODO: replace content with signup form */}
 			<Modal
 				isOpen={modalType === "signup"}
 				onClose={() => setModalType(null)}>
