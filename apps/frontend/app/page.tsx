@@ -1,6 +1,7 @@
 import AuthModalHandler from "./components/Header/AuthModalHandler/AuthModalHandler";
 import SessionDropdown from "./components/Header/SessionDropdown";
 import ThemeToggler from "./components/Header/ThemeToggler";
+import Demo from "./components/demo/demo";
 
 // This is the landing page for the TODO List
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
 						Got it done? Just Tick-it.
 					</h2>
 				</div>
+				<Demo />
 			</main>
 			<footer className="bg-lightSecondary text-lightText   dark:bg-darkSecondary flex flex-col transition-colors duration-500">
 				<div className="place-self-center">
