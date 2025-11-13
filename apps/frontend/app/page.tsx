@@ -1,4 +1,4 @@
-import Link from "next/link";
+import AuthModalHandler from "./components/Header/AuthModalHandler/AuthModalHandler";
 import SessionDropdown from "./components/Header/SessionDropdown";
 import ThemeToggler from "./components/Header/ThemeToggler";
 
@@ -10,13 +10,10 @@ export default function Home() {
 				<div className="absolute -top-1 left-4">
 					<ThemeToggler />
 				</div>
-				<Link
-					href={"/login"}
-					className="py-3">
-					Login
-				</Link>
+				<AuthModalHandler />
 				<SessionDropdown />
 			</header>
+
 			<main className="mb-auto h-full bg-lightPrimary dark:bg-darkPrimary transition-colors duration-500">
 				<div className="flex flex-col items-center justify-center">
 					<h1 className="font-bold text-lightText dark:text-darkText transition-colors duration-500 text-5xl sm:text-6xl md:text-8xl lg:text-9xl mt-20 sm:mt-25 md:mt-25 lg:mt-40">
