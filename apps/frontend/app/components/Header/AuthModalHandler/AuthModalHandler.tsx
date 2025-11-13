@@ -28,7 +28,9 @@ export default function AuthModalHandler() {
 				onClose={() => {
 					setModalType(null);
 				}}>
-				<header className="absolute top-0 left-0 bg-lightSecondary py-2 dark:bg-darkSecondary w-full ">
+				<header
+					className="absolute
+				 top-0 left-0 bg-lightSecondary py-2 dark:bg-darkSecondary w-full ">
 					<h2 className="text-lightText  font-semibold ml-4">
 						Log into your account
 					</h2>
