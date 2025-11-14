@@ -45,7 +45,7 @@ export default async function RootLayout({
 			data-scroll-behavior="smooth"
 			data-theme={`${theme === Theme.Light ? "" : "dark"}`}>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
+				className={`${geistSans.variable} ${geistMono.variable} antialiased relative max-w-dvw`}>
 				{auth}
 				<main>{children}</main>
 			</body>
