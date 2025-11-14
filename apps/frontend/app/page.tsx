@@ -4,12 +4,14 @@ import SessionDropdown from "./components/Header/SessionDropdown";
 import ThemeToggler from "./components/Header/ThemeToggler";
 import Demo from "./components/demo/demo";
 import BouncingArrow from "./components/animations/bouncingArrow";
+import NotificationTable from "./components/notifications/NotificationTable";
+import NotificationCard from "./components/notifications/NotificationCard";
 
 // This is the landing page for the TODO List
 export default function Home() {
 	return (
 		<div className="flex flex-col min-h-dvh justify-between bg-lightPrimary dark:bg-darkPrimary transition-colors duration-500 ">
-			<header className="  text-lightText sticky top-0 bg-lightSecondary flex flex-row justify-end gap-6 dark:bg-darkSecondary border-b-accent border-b-2 transition-colors duration-500">
+			<header className="  text-lightText sticky top-0 z-10 bg-lightSecondary flex flex-row justify-end gap-6 dark:bg-darkSecondary border-b-accent border-b-2 transition-colors duration-500">
 				<div className="absolute -top-1 left-4">
 					<ThemeToggler />
 				</div>
@@ -51,8 +53,53 @@ export default function Home() {
 				<div className="mt-20">
 					<Demo />
 				</div>
+				{/**TODO: Remove this. Notification Table should only be visible when logged in. */}
+				<NotificationTable>
+					<NotificationCard taskName="Math Assignment 3">
+						<p className="">{"Due in 3 days"}</p>
+					</NotificationCard>
+
+					<NotificationCard taskName="Finish SOFE2800U Final Project">
+						<p className="">{"Due in 2 weeks"}</p>
+					</NotificationCard>
+					<NotificationCard taskName="Math Assignment 3">
+						<p className="">{"Due in 3 days"}</p>
+					</NotificationCard>
+
+					<NotificationCard taskName="Finish SOFE2800U Final Project">
+						<p className="">{"Due in 2 weeks"}</p>
+					</NotificationCard>
+					<NotificationCard taskName="Math Assignment 3">
+						<p className="">{"Due in 3 days"}</p>
+					</NotificationCard>
+
+					<NotificationCard taskName="Finish SOFE2800U Final Project">
+						<p className="">{"Due in 2 weeks"}</p>
+					</NotificationCard>
+					<NotificationCard taskName="Math Assignment 3">
+						<p className="">{"Due in 3 days"}</p>
+					</NotificationCard>
+
+					<NotificationCard taskName="Finish SOFE2800U Final Project">
+						<p className="">{"Due in 2 weeks"}</p>
+					</NotificationCard>
+					<NotificationCard taskName="Math Assignment 3">
+						<p className="">{"Due in 3 days"}</p>
+					</NotificationCard>
+
+					<NotificationCard taskName="Finish SOFE2800U Final Project">
+						<p className="">{"Due in 2 weeks"}</p>
+					</NotificationCard>
+					<NotificationCard taskName="Math Assignment 3">
+						<p className="">{"Due in 3 days"}</p>
+					</NotificationCard>
+
+					<NotificationCard taskName="Finish SOFE2800U Final Project">
+						<p className="">{"Due in 2 weeks"}</p>
+					</NotificationCard>
+				</NotificationTable>
 			</main>
-			<footer className="bg-lightSecondary text-lightText sticky bottom-0 dark:bg-darkSecondary flex flex-col transition-colors duration-500">
+			<footer className="bg-lightSecondary text-lightText sticky bottom-0 z-10 dark:bg-darkSecondary flex flex-col transition-colors duration-500">
 				<div className="place-self-center">
 					<p> Tick-It &copy; 2025</p>
 				</div>
