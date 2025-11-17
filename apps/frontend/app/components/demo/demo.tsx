@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useInView, Variants } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, Variants } from "motion/react";
+import { useState } from "react";
 import Card from "../Card";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import Modal from "../Modal";
@@ -18,13 +18,6 @@ const demoVariants: Variants = {
 			duration: 5000,
 			opacity: { ease: "linear" },
 		},
-	},
-};
-
-const rowExitVariants: Variants = {
-	hidden: {
-		opacity: 0,
-		transition: { duration: 0.3 },
 	},
 };
 

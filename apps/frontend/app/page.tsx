@@ -6,7 +6,6 @@ import Demo from "./components/demo/demo";
 import BouncingArrow from "./components/animations/bouncingArrow";
 import NotificationTable from "./components/notifications/NotificationTable";
 import NotificationCard from "./components/notifications/NotificationCard";
-import Card from "./components/Card";
 
 // This is the landing page for the TODO List
 export default function Home() {
