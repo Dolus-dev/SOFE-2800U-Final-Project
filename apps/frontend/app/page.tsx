@@ -6,6 +6,7 @@ import Demo from "./components/demo/demo";
 import BouncingArrow from "./components/animations/bouncingArrow";
 import NotificationTable from "./components/notifications/NotificationTable";
 import NotificationCard from "./components/notifications/NotificationCard";
+import Card from "./components/Card";
 
 // This is the landing page for the TODO List
 export default function Home() {
@@ -43,14 +44,14 @@ export default function Home() {
 							<span className="">Deadline notifications!</span>
 						</div>
 					</div>
-					<div className="mt-55 flex flex-row text-lightText dark:text-darkText transition-colors duration-500 items-center font-semibold text-xl gap-2 p-2 ">
+					<div className="mt-90 flex flex-row text-lightText dark:text-darkText transition-colors duration-500 items-center font-semibold text-xl gap-2 p-2 ">
 						<BouncingArrow />
 						Try It Yourself! <BouncingArrow />
 					</div>
 				</div>
 				<hr className="bg-lightSecondary dark:bg-darkSecondary border-0 h-0.5 w-full mb-16 transition-colors duration-500" />
 
-				<div className="mt-20">
+				<div className="mt-10">
 					<Demo />
 				</div>
 				{/**TODO: Remove this. Notification Table should only be visible when logged in. */}
