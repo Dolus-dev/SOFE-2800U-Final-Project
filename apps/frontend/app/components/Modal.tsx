@@ -52,7 +52,7 @@ export default function Modal({
 					exit="hidden"
 					onClick={onClose}>
 					<motion.div
-						className="bg-lightPrimary p-6 rounded-xl flex flex-col justify-center overflow-hidden relative shadow-xl w-full max-w-md mx-4 dark:bg-darkPrimary"
+						className="bg-lightPrimary rounded-xl flex flex-col justify-center overflow-hidden relative shadow-xl w-full max-w-md mx-4 dark:bg-darkPrimary"
 						variants={modalVariants}
 						initial="hidden"
 						animate="visible"
