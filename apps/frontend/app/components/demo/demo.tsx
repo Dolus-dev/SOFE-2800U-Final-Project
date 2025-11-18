@@ -46,13 +46,16 @@ export default function Demo() {
 				initial="hidden"
 				whileInView="visible"
 				className="">
+
+					<p className="text-center font-semibold -mt-4 mb-2">Click on any task to mark it as complete. It gets crossed out when marked completed!<br /> Did it by accident? No worries, click it again to undo the completion status!</p>
+
 				<Card>
 					<table className="min-w-3xl text-lightText dark:text-darkText transition-colors duration-500 table-auto">
 						<thead className="bg-lightSecondary dark:bg-darkSecondary transition-colors duration-500 ">
 							<tr className="">
 								<th className="py-2">Task</th>
 								<th className="py-2">Due</th>
-								<td></td>
+			
 							</tr>
 						</thead>
 						<motion.tbody
@@ -64,12 +67,13 @@ export default function Demo() {
 										key={item.task}
 										layout
 										variants={demoVariants}
+										onClick={()=>{handleComplete(item)}}
 										initial="hidden"
 										whileInView="visible"
 										exit="hidden"
-										className={`${index % 2 === 0 ? "bg-[#F9C390] dark:bg-darkBackground" : " bg-[#FEF2E7]"} relative not-last:border-b border-lightSecondary dark:border-darkSecondary transition-colors duration-500`}>
+										className={`${index % 2 === 0 ? "bg-[#F9C390] dark:bg-darkBackground" : " bg-[#FEF2E7]"} relative not-last:border-b hover:cursor-pointer border-lightSecondary dark:border-darkSecondary transition-colors duration-500`}>
 										<td className="px-4 py-2  ">
-											<span className={item.completed ? "opacity-50" : ""}>
+											<span className={(item.completed ? "opacity-50" : "") + " transition-opacity duration-500" }>
 												{item.task}
 											</span>
 											<AnimatePresence>
@@ -94,8 +98,9 @@ export default function Demo() {
 												)}
 											</AnimatePresence>
 										</td>
-										<td className="px-4 py-2 text-center">
-											{item.due ? (
+										<td className={`px-4 py-2 text-center transition-opacity duration-500 ${item.completed ? "opacity-50" : ""}`}>
+											
+													{item.due ? (
 												<time
 													dateTime={item.due.toLocaleDateString()}
 													suppressHydrationWarning>
@@ -104,14 +109,9 @@ export default function Demo() {
 											) : (
 												"N/A"
 											)}
+											
 										</td>
-										<td className="px-4 py-2 text-center">
-											<button
-												onClick={() => handleComplete(item)}
-												className={` ${item.completed ? "bg-green-500 hover:bg-green-600" : "bg-accent hover:bg-accentDark"} text-white font-bold py-1 px-3 rounded transition-colors duration-300 ${item.completed ? "opacity-50" : ""}`}>
-												{item.completed ? "Undo" : "Complete"}
-											</button>
-										</td>
+									
 									</motion.tr>
 								))}
 								<tr>
