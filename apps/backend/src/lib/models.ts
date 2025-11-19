@@ -124,15 +124,6 @@ const taskSubSchema = new Schema<ITask>(
 	{ _id: false }
 );
 
-const taskCategorySchema = new Schema<ITaskCategory>(
-	{
-		kind: { type: String, required: true, enum: ["Category"] },
-		categoryName: { type: String, required: true },
-		Tasks: { type: [taskSubSchema], default: [] },
-	},
-	{ _id: false }
-);
-
 const taskItemSchema = new Schema(
 	{
 		kind: { type: String, required: true, enum: ["Task", "Category"] },
@@ -179,3 +170,5 @@ const taskSchema = new Schema<ITasks, TasksModel>(
 		},
 	}
 );
+
+export const Task = model("Tasks", taskSchema);
