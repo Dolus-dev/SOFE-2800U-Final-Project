@@ -6,3 +6,8 @@ export const router = express.Router();
 router.get("/", (req, res) => {
 	res.send("This is the signin route");
 });
+
+
+router.post('/', async (req, res) => {
+	
+})

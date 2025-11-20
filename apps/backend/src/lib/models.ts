@@ -135,6 +135,7 @@ const taskItemSchema = new Schema(
 		completed: { type: Boolean },
 		// fields for category
 		categoryName: { type: String },
+		categoryDescription: {type: String},
 		Tasks: { type: [taskSubSchema], default: undefined },
 	},
 	{ _id: false }
