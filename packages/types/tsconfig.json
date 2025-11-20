@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"target": "es2024",
+		"module": "nodenext",
+		"declaration": true,
+		"declarationMap": true,
+		"moduleResolution": "nodenext",
+		"outDir": "dist",
+		"rootDir": "src",
+		"composite": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true
+	}
+}
