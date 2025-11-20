@@ -5,27 +5,59 @@ import Modal from "../../Modal";
 import { motion } from "motion/react";
 import { Email } from "@/app/lib/types/types";
 import { isValidEmail } from "@/app/lib/authValidations";
+import handleLogin from "@/app/lib/auth/handleLogin";
 
 export default function AuthModalHandler() {
 	const [modalType, setModalType] = useState<"login" | "signup" | null>(null);
-	const [login, setLogin] = useState<{ login: Email | string; pass: string }>({
-		login: "",
+	const [login, setLogin] = useState<{ username: string; email: Email | string; pass: string }>({
+		username: '',
+		email: '',
 		pass: "",
 	});
+
+	const [submissionDisabled, setSubmissionDisabled] = useState(true)
 
 	const [emailValid, setEmailValid] = useState<null | true | false>(null);
 
 	const handleCredentialChange = (input: string) => {
 		const isEmail = input.includes("@");
-		setLogin((prev) => ({
-			...prev,
-			login: input,
-		}));
 
-		if (isEmail && isValidEmail(input)) {
-			setEmailValid(true);
+		if (isEmail) {	
+			setLogin((prev) => ({
+				...prev,
+				username: '',
+				email: input
+			}))
+			setEmailValid(false)
+			if (isValidEmail(input)) {
+				setEmailValid(true)
+			}
 		}
+
+		else {
+			setLogin((prev)=>({
+				...prev,
+				username: input,
+				email: ''
+			}))
+			setEmailValid(null)
+		}
+
+		console.log(login)
 	};
+
+	const handlePasswordChange = (input: string) => {
+		setLogin((prev)=> ({
+			...prev,
+			pass: input,
+		}))
+
+		if (login.pass.trim() !== '' && (login.username.trim() !== '' || login.email.trim() !== '')) {
+			setSubmissionDisabled(false)
+		}
+	}
+
+		 
 
 	return (
 		<>
@@ -55,30 +87,49 @@ export default function AuthModalHandler() {
 				</header>
 				<main className="mt-4 text-lightText dark:text-darkText">
 					<form
-						action={() => {
-							if (emailValid) {
-							}
+						onSubmit={ async (e) => {
+							e.preventDefault();
+
+							const formData = new FormData();
+							formData.append('username', login.username)
+							formData.append('password', login.pass)
+
+							await handleLogin(formData);
+
 						}}
+						
 						className="flex flex-col 	gap-4 px-4 py-2 place-self-center">
 						<div className="">
-							<label> Username/Email:</label>
+							<label htmlFor="username/email"> Username/Email:</label>
+						
 							<input
 								type="text"
-								value={login.login}
-								onChange={(e) => handleCredentialChange(e.target.value)}
+								value={login.username ? login.username : login.email}
+								id="username/email"
+								name="username/email"
+								onChange={(e) => {handleCredentialChange(e.target.value)
+									console.log(e.target.value)
+								}}
 								className=" w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
 							/>
+								{emailValid === false && (
+								<p className="text-red-500 text-sm font-semibold - mb-2">Invalid Email</p>
+							)}
 						</div>
 						<div className="">
-							<label>Password:</label>
+							<label htmlFor="password">Password:</label>
 							<input
 								type="password"
+								id="password"
+								name="password"
+								onChange={(e) => handlePasswordChange(e.target.value)}
 								className=" w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
 							/>
 						</div>
 
 						<button
 							type="submit"
+							disabled={submissionDisabled}
 							className="bg-accent w-50 place-self-center rounded-lg p-1 text-black hover:cursor-pointer">
 							Login
 						</button>
