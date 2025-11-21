@@ -7,6 +7,9 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import Modal from "../../Modal";
 import handleRegister from "@/app/lib/auth/handleRegister";
+import { postFetcher } from "@/app/lib/fetcher";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
 export default function RegisterModal() {
 	function isValidPassword(s: string) {
@@ -16,6 +19,46 @@ export default function RegisterModal() {
 			return false;
 		} else return true;
 	}
+
+	async function fetcher(
+		url: string,
+		{
+			arg,
+		}: {
+			arg: {
+				username: string;
+				firstName: string;
+				lastName: string;
+				email: Email;
+				password: Password;
+			};
+		}
+	) {
+		const res = await fetch(url, {
+			method: "POST",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(arg),
+		});
+
+		if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+
+		return res.json();
+	}
+
+	const { trigger, isMutating, error, data } = useSWRMutation<
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		any,
+		Error,
+		"http://localhost:3001/auth/register",
+		{
+			username: string;
+			firstName: string;
+			lastName: string;
+			email: Email;
+			password: Password;
+		}
+	>("http://localhost:3001/auth/register", fetcher);
 
 	const [userDetails, setUserDetails] = useState<AccountRegistrationData>({
 		username: "",
@@ -123,13 +166,17 @@ export default function RegisterModal() {
 					<form
 						onSubmit={async (e) => {
 							e.preventDefault();
-							const formData = new FormData();
-							formData.append("username", userDetails.username);
-							formData.append("Fname", userDetails.Fname);
-							formData.append("Lname", userDetails.Lname);
-							formData.append("email", userDetails.email as Email);
-							formData.append("password", userDetails.password as Password);
-							await handleRegister(formData);
+							const formData = {
+								username: userDetails.username,
+								firstName: userDetails.Fname,
+								lastName: userDetails.Lname,
+								email: userDetails.email as Email,
+								password: userDetails.password as Password,
+							};
+
+							const result = await trigger(formData);
+							console.log(data);
+							console.log(result);
 						}}
 						className="flex flex-col gap-4 px-4 py-2 place-self-center">
 						<div className=" flex flex-row gap-4 justify-items-center">

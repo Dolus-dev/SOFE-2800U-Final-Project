@@ -1,3 +1,14 @@
 "use server";
 
-export default async function handleRegister(formData: FormData) {}
+import {User} from '@/app/lib/'
+
+
+
+export default async function handleRegister(formData: FormData) {
+	console.log(formData);
+
+
+
+}
+
+}
