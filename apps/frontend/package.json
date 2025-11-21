@@ -9,6 +9,7 @@
 		"lint": "eslint"
 	},
 	"dependencies": {
+		"@repo/types": "*",
 		"@heroicons/react": "^2.2.0",
 		"jsonwebtoken": "^9.0.2",
 		"motion": "^12.23.24",

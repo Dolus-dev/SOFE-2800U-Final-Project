@@ -7,7 +7,7 @@
 	},
 	"comments": "The exports option in package.json needs to be updated every time a new file is added.",
 	"exports": {
-		"./example": {
+		".": {
 			"types": "./dist/types.d.ts",
 			"default": "./dist/types.js"
 		}
