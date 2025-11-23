@@ -1,23 +1,60 @@
 "use client";
 
 import { isValidEmail } from "@/app/lib/authValidations";
-import { AccountRegistrationData, Email, Password } from "@repo/types";
+import { Email, Password } from "@repo/types";
 import { motion } from "motion/react";
 
 import { useState } from "react";
 import Modal from "../../Modal";
-import handleRegister from "@/app/lib/auth/handleRegister";
-import { postFetcher } from "@/app/lib/fetcher";
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
+type RegisterResponse = {
+	success: boolean;
+	message?: string;
+	fieldErrors?: {
+		[k: string]: string;
+	};
+};
+
+class FetchError extends Error {
+	fieldErrors?: { [k: string]: string };
+	status?: number;
+
+	constructor(
+		message: string,
+		fieldErrors?: { [k: string]: string },
+		status?: number
+	) {
+		super(message);
+		this.name = "FetchError";
+		this.fieldErrors = fieldErrors;
+		this.status = status;
+	}
+}
+
 export default function RegisterModal() {
-	function isValidPassword(s: string) {
+	function isValidPassword(s: string): {
+		valid: boolean;
+		reason?:
+			| "Password must be at least 8 characters long"
+			| "Password must contain at least 1 Uppercase, 1 Lowercase, and 1 Special Character";
+	} {
 		const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
 
-		if (!regex.test(s)) {
-			return false;
-		} else return true;
+		if (s.length < 8)
+			return {
+				valid: false,
+				reason: "Password must be at least 8 characters long",
+			};
+		else {
+			return regex.test(s) == true
+				? { valid: true }
+				: {
+						valid: false,
+						reason:
+							"Password must contain at least 1 Uppercase, 1 Lowercase, and 1 Special Character",
+					};
+		}
 	}
 
 	async function fetcher(
@@ -41,14 +78,20 @@ export default function RegisterModal() {
 			body: JSON.stringify(arg),
 		});
 
-		if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+		if (!res.ok) {
+			const errorData = await res.json();
+			throw new FetchError(
+				errorData.message || `HTTP ${res.status}`,
+				errorData.fieldErrors,
+				res.status
+			);
+		}
 
-		return res.json();
+		return await res.json();
 	}
 
-	const { trigger, isMutating, error, data } = useSWRMutation<
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		any,
+	const { trigger, isMutating } = useSWRMutation<
+		RegisterResponse,
 		Error,
 		"http://localhost:3001/auth/register",
 		{
@@ -60,90 +103,25 @@ export default function RegisterModal() {
 		}
 	>("http://localhost:3001/auth/register", fetcher);
 
-	const [userDetails, setUserDetails] = useState<AccountRegistrationData>({
-		username: "",
-		email: "",
-		password: null,
-		Fname: "",
-		Lname: "",
-	});
-
-	const [email, setEmail] = useState<{
-		valid: boolean | null;
-		errorMessage?: string;
-	}>({ valid: null });
-	const [password, setPassword] = useState<{
-		valid: boolean | null;
-		errorMessage?: string;
-	}>({ valid: null });
 	const [isOpen, setIsOpen] = useState(false);
-	const [submissionDisabled, setSubmissionDisabled] = useState(true);
-
-	const handleFormChange = (event: EventTarget & HTMLInputElement) => {
-		const input = event.value.trim();
-
-		switch (event.id) {
-			case "username":
-				setUserDetails((prev) => ({
-					...prev,
-					username: input,
-				}));
-				break;
-			case "email":
-				try {
-					if (!isValidEmail(input)) {
-						setEmail({ valid: false, errorMessage: "Invalid Email Format" });
-					} else setEmail({ valid: true });
-					setUserDetails((prev) => ({ ...prev, email: input }));
-				} catch (e) {
-					console.log(e);
-				} finally {
-					break;
-				}
-			case "Fname":
-				setUserDetails((prev) => ({
-					...prev,
-					Fname: input,
-				}));
-				break;
-			case "Lname":
-				setUserDetails((prev) => ({
-					...prev,
-					Lname: input,
-				}));
-				break;
-			case "password":
-				try {
-					if (!isValidPassword(input)) {
-						setPassword({
-							valid: false,
-							errorMessage: `Password have 1 uppercase letter, 1 lowercase letter, 1 special character, and be at least 8 characters long`,
-						});
-					} else if (isValidPassword(input)) {
-						setPassword({
-							valid: true,
-						});
-					}
-
-					setUserDetails((prev) => ({
-						...prev,
-						password: input as Password,
-					}));
-				} catch (error) {
-					console.log(error);
-				}
-		}
-
-		if (
-			userDetails.Fname === "" ||
-			userDetails.Lname === "" ||
-			email.valid === false ||
-			password.valid === false ||
-			userDetails.username === ""
-		) {
-			setSubmissionDisabled(true);
-		} else setSubmissionDisabled(false);
-	};
+	const [firstNameMissing, setFirstNameMissing] = useState(false);
+	const [lastNameMissing, setLastNameMissing] = useState(false);
+	const [usernameMissing, setUsernameMissing] = useState<{
+		missing: boolean;
+		reason?: "Username must be at least 5 characters long" | string;
+	}>({ missing: false });
+	const [emailValid, setEmailValid] = useState<{
+		valid: boolean;
+		reason?: "Invalid Email" | string;
+	}>({ valid: true });
+	const [passwordValid, setPasswordValid] = useState<{
+		valid: boolean;
+		reason?:
+			| "Password must be at least 8 characters long"
+			| "Password must contain at least 1 Uppercase, 1 Lowercase, and 1 Special Character"
+			| undefined
+			| string;
+	}>({ valid: true });
 
 	return (
 		<>
@@ -166,80 +144,154 @@ export default function RegisterModal() {
 					<form
 						onSubmit={async (e) => {
 							e.preventDefault();
-							const formData = {
-								username: userDetails.username,
-								firstName: userDetails.Fname,
-								lastName: userDetails.Lname,
-								email: userDetails.email as Email,
-								password: userDetails.password as Password,
+							const formData = new FormData(e.currentTarget);
+							const rawFormData = {
+								username: String(formData.get("username")).trim(),
+								firstName: String(formData.get("Fname")).trim(),
+								lastName: String(formData.get("Lname")).trim(),
+								email: String(formData.get("email")).trim(),
+								password: String(formData.get("password")).trim(),
 							};
 
-							const result = await trigger(formData);
-							console.log(data);
-							console.log(result);
+							const passwordValidation = isValidPassword(rawFormData.password);
+							const errors = {
+								firstName: !rawFormData.firstName,
+								lastName: !rawFormData.lastName,
+								username:
+									!rawFormData.username || rawFormData.username.length < 5,
+								email: !isValidEmail(rawFormData.email),
+								password: !passwordValidation.valid,
+							};
+
+							// Update all error states at once
+							setFirstNameMissing(errors.firstName);
+							setLastNameMissing(errors.lastName);
+							setUsernameMissing({
+								missing: errors.username,
+								reason: "Username must be at least 5 characters long",
+							});
+							setEmailValid({
+								valid: !errors.email,
+								reason: errors.email ? "Invalid Email" : undefined,
+							});
+							setPasswordValid({
+								valid: !errors.password,
+								reason: passwordValidation.reason,
+							});
+
+							if (Object.values(errors).some((err) => err)) {
+								console.log(Object.values(errors).some((err) => err));
+								return;
+							}
+
+							const parsedFormData = {
+								username: rawFormData.username,
+								firstName: rawFormData.firstName,
+								lastName: rawFormData.lastName,
+								email: rawFormData.email as Email,
+								password: rawFormData.password as Password,
+							};
+
+							try {
+								const result = await trigger({ ...parsedFormData });
+
+								console.log(result);
+							} catch (error) {
+								console.error("Registration error:", error);
+
+								if (error instanceof FetchError && error.fieldErrors) {
+									if (error.fieldErrors.username) {
+										setUsernameMissing({
+											missing: true,
+											reason: error.fieldErrors.username,
+										});
+									}
+									if (error.fieldErrors.email) {
+										setEmailValid({
+											valid: false,
+											reason: error.fieldErrors.email,
+										});
+									}
+								}
+							}
 						}}
-						className="flex flex-col gap-4 px-4 py-2 place-self-center">
+						className="flex flex-col gap-4 px-4 py-2 place-items-center ">
 						<div className=" flex flex-row gap-4 justify-items-center">
 							<div className="flex flex-col">
-								<label htmlFor="Fname">First Name:</label>
+								<label htmlFor="">First Name:</label>
 								<input
 									type="text"
-									id="Fname"
-									onChange={(e) => handleFormChange(e.target)}
+									name="Fname"
+									// required
 									className="w-35 border-2 block rounded-md border-black bg-gray-400/20 px-2"
 								/>
+								{firstNameMissing == true && (
+									<p className="text-red-500 text-em font-semibold -mb-2">
+										First name is required.
+									</p>
+								)}
 							</div>
 							<div className="flex flex-col">
 								<label htmlFor="Fname">Last Name:</label>
 								<input
 									type="text"
-									id="Lname"
-									onChange={(e) => handleFormChange(e.target)}
+									name="Lname"
+									// required
 									className="w-35 border-2 block rounded-md border-black bg-gray-400/20 px-2"
 								/>
+								{lastNameMissing == true && (
+									<p className="text-red-500 text-sm font-semibold -mb2">
+										Last name is required.
+									</p>
+								)}
 							</div>
 						</div>
 						<div>
 							<label htmlFor="username">Username:</label>
 							<input
 								type="text"
-								id="username"
-								onChange={(e) => handleFormChange(e.target)}
+								name="username"
 								className="w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
+								// required
 							/>
-						</div>
-						<div>
-							<label htmlFor="email">Email:</label>
-							<input
-								type="text"
-								id="email"
-								onChange={(e) => handleFormChange(e.target)}
-								className="w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
-							/>
-							{email.valid === false && (
-								<p className="text-red-500 text-sm font-semibold -mb-2">
-									{email.errorMessage}
+							{usernameMissing.missing === true && (
+								<p className="text-red-500 text-sm font-semibold -mb2">
+									{usernameMissing.reason}
 								</p>
 							)}
 						</div>
 						<div>
+							<label htmlFor="email">Email:</label>
+							<input
+								type="email"
+								name="email"
+								className="w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
+								// required
+							/>
+							{emailValid.valid === false && (
+								<p className="text-red-500 text-sm font-semibold -mb-2">
+									{emailValid.reason}
+								</p>
+							)}
+						</div>
+						<div className="flex flex-col items-start w-70">
 							<label htmlFor="password">Password:</label>
 							<input
 								type="password"
-								id="password"
-								onChange={(e) => handleFormChange(e.target)}
+								name="password"
+								// required
 								className="w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
 							/>
-							{password.valid === false && (
-								<p className="text-red-500 text-sm font-semibold -mb-2 ">
-									{password.errorMessage}
+							{passwordValid.valid === false && (
+								<p className="text-red-500 text-xs text-start font-semibold -mb-2 ">
+									{passwordValid.reason}
 								</p>
 							)}
 						</div>
 
 						<button
 							type="submit"
-							disabled={submissionDisabled}
+							disabled={isMutating}
 							className="bg-accent w-50 place-self-center rounded-lg p-1 text-black disabled:cursor-not-allowed disabled:bg-gray-400/90 disabled:text-black/40 hover:cursor-pointer">
 							Register
 						</button>

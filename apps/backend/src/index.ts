@@ -22,7 +22,7 @@ app.use("/", baseRouter);
 
 const PORT = 3001;
 
-if (!process.env.MONGODB_URL) {
+if (!process.env.MONGODB_URL || !process.env.JWT_SECRET) {
 	throw new Error("One or more environment variables are not defined!");
 }
 

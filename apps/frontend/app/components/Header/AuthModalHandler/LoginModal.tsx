@@ -2,14 +2,85 @@
 
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Email } from "@repo/types";
+import { Email, Password } from "@repo/types";
 import Modal from "../../Modal";
-import handleLogin from "@/app/lib/auth/handleLogin";
+import useSWRMutation from "swr/mutation";
 import { isValidEmail } from "@/app/lib/authValidations";
 
+type LoginResponse = {
+	success: boolean;
+	message?: string;
+	fieldErrors?: {
+		[k: string]: string;
+	};
+	user?: {
+		id: string;
+		UUID: string;
+		username: string;
+		email?: string;
+	};
+};
+
+class FetchError extends Error {
+	fieldErrors?: { [k: string]: string };
+	status?: number;
+
+	constructor(
+		message: string,
+		fieldErrors?: { [k: string]: string },
+		status?: number
+	) {
+		super(message);
+		this.name = "FetchError";
+		this.fieldErrors = fieldErrors;
+		this.status = status;
+	}
+}
+
 export default function LoginModal() {
-	const [submissionDisabled, setSubmissionDisabled] = useState(true);
+	async function fetcher(
+		url: string,
+		{
+			arg,
+		}: {
+			arg: {
+				credential: string;
+				password: Password;
+			};
+		}
+	) {
+		const res = await fetch(url, {
+			method: "POST",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(arg),
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json();
+			throw new FetchError(
+				errorData.message || `HTTP ${res.status}`,
+				errorData.fieldErrors,
+				res.status
+			);
+		}
+
+		return await res.json();
+	}
+
+	const { trigger, isMutating } = useSWRMutation<
+		LoginResponse,
+		Error,
+		"http://localhost:3001/auth/signin",
+		{
+			credential: string;
+			password: Password;
+		}
+	>("http://localhost:3001/auth/signin", fetcher);
+
 	const [emailValid, setEmailValid] = useState<null | true | false>(null);
+	const [credentialError, setCredentialError] = useState<string | null>(null);
+	const [passwordError, setPasswordError] = useState<string | null>(null);
 	const [login, setLogin] = useState<{
 		username: string;
 		email: Email | string;
@@ -46,10 +117,6 @@ export default function LoginModal() {
 				}));
 				break;
 		}
-
-		if (login.pass !== "" && (login.username !== "" || login.username !== "")) {
-			setSubmissionDisabled(false);
-		} else setSubmissionDisabled(true);
 	};
 
 	return (
@@ -73,13 +140,54 @@ export default function LoginModal() {
 					<form
 						onSubmit={async (e) => {
 							e.preventDefault();
+							const formData = new FormData(e.currentTarget);
 
-							const formData = new FormData();
-							formData.append("username", login.username);
-							formData.append("email", login.email);
-							formData.append("password", login.pass);
+							const rawFormData = {
+								credential: String(formData.get("username/email")).trim(),
+								password: String(formData.get("password")).trim(),
+							};
 
-							await handleLogin(formData);
+							// Clear previous errors
+							setCredentialError(null);
+							setPasswordError(null);
+
+							// Client-side validation
+							if (!rawFormData.credential) {
+								setCredentialError("Username or email is required");
+								return;
+							}
+							if (!rawFormData.password) {
+								setPasswordError("Password is required");
+								return;
+							}
+
+							const parsedFormData = {
+								credential: rawFormData.credential,
+								password: rawFormData.password as Password,
+							};
+
+							try {
+								const result = await trigger({ ...parsedFormData });
+								console.log("Login success:", result);
+
+								if (result?.success) {
+									// Close modal on success
+									setIsOpen(false);
+									console.log("User logged in:", result.user);
+									// Optional: redirect or show success message
+								}
+							} catch (error) {
+								console.error("Login error:", error);
+
+								if (error instanceof FetchError && error.fieldErrors) {
+									if (error.fieldErrors.credential) {
+										setCredentialError(error.fieldErrors.credential);
+									}
+									if (error.fieldErrors.password) {
+										setPasswordError(error.fieldErrors.password);
+									}
+								}
+							}
 						}}
 						className="flex flex-col gap-4 px-4 py-2 place-self-center">
 						<div>
@@ -97,6 +205,11 @@ export default function LoginModal() {
 									Invalid Email
 								</p>
 							)}
+							{credentialError && (
+								<p className="text-red-500 text-sm font-semibold -mb-2">
+									{credentialError}
+								</p>
+							)}
 						</div>
 
 						<div>
@@ -108,13 +221,18 @@ export default function LoginModal() {
 								onChange={(e) => handleFormChange(e.target)}
 								className="w-70 border-2 block rounded-md border-black bg-gray-400/20 px-2"
 							/>
+							{passwordError && (
+								<p className="text-red-500 text-sm font-semibold -mb-2">
+									{passwordError}
+								</p>
+							)}
 						</div>
 
 						<button
 							type="submit"
-							disabled={submissionDisabled}
+							disabled={isMutating}
 							className="bg-accent w-50 place-self-center rounded-lg p-1 text-black disabled:cursor-not-allowed disabled:bg-gray-400/90 disabled:text-black/40 hover:cursor-pointer">
-							Login
+							{isMutating ? "Logging in..." : "Login"}
 						</button>
 					</form>
 				</main>

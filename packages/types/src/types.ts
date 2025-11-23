@@ -13,6 +13,6 @@ export type AccountRegistrationData = {
 	username: string;
 	email: Email | string;
 	password: Password | null;
-	Fname: string;
-	Lname: string;
+	firstName: string;
+	lastName: string;
 };

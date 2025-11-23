@@ -6,8 +6,8 @@ export interface IUser {
 	_id: Types.ObjectId;
 	_version: number;
 	UUID: string;
-	fName: string;
-	lName: string;
+	firstName: string;
+	lastName: string;
 	username: string;
 	email?: string;
 	passwordHash: string;
@@ -31,9 +31,15 @@ export interface UserSettingsModel extends Model<IUserSettings> {
 const userSchema = new Schema<IUser, UserModel>(
 	{
 		_version: { type: Number, default: 1, select: false },
-		UUID: { type: String, required: true, unique: true, index: true },
-		fName: { type: String, required: true },
-		lName: { type: String, required: true },
+		UUID: {
+			type: String,
+			required: true,
+			unique: true,
+			index: true,
+			default: () => crypto.randomUUID(),
+		},
+		firstName: { type: String, required: true },
+		lastName: { type: String, required: true },
 		email: {
 			type: String,
 			required: false,
@@ -81,95 +87,276 @@ const userSchema = new Schema<IUser, UserModel>(
 export const User = model<IUser, UserModel>("User", userSchema);
 
 export interface ITask {
+	id: string;
+	userId: string;
+
+	//core fields
+	title: string;
+	description?: string;
+	notes?: string;
+
+	categoryId: string;
+	projectId?: string;
+	tags: string[];
+
+	// Status Tracking
+
+	status: "pending" | "in-progress" | "completed" | "archived";
+	priority: "low" | "medium" | "high";
+
+	// Dates
+	dueDate?: Date;
+	startDate?: Date;
+	createdAt: Date;
+	updatedAt: Date;
+	completedAt?: Date;
+
+	// Subtasks (embedded documents)
+
+	subtasks: Array<{
+		id: string;
+		text: string;
+		completed: boolean;
+		order: number;
+	}>;
+
+	// Metadata
+
+	estimatedDuration?: number;
+	actualDuration?: number;
+	reminderDate?: Date;
+	recurringPattern?: {
+		frequency: "daily" | "weekly" | "monthly";
+		interval: number;
+		endDate?: Date;
+	};
+}
+
+export interface Category {
+	id: string;
+	userId: string;
+	name: string;
+	color: string;
+	icon?: string;
+	isDefault: boolean;
+	createdAt: Date;
+}
+
+export interface TaskStats {
+	userId: string;
+	totalTasks: number;
+	completedTasks: number;
+	overdueTasks: number;
+	completedToday: number;
+	completedThisWeek: number;
+	pendingTasks: number;
+	inProgressTasks: number;
+	completionRate: number; // percentage
+}
+
+export interface TaskModel extends Model<ITask> {
+	getStatsByUserId(userId: string): Promise<TaskStats>;
+}
+
+const subtaskSchema = new Schema({
+	id: { type: String, required: true, default: () => crypto.randomUUID() },
+	text: { type: String, required: true },
+	completed: { type: Boolean, default: false },
+	order: { type: Number, required: true },
+});
+
+const taskSchema = new Schema<ITask, TaskModel>(
+	{
+		id: { type: String, required: true, default: () => crypto.randomUUID() },
+		userId: { type: String, required: true, index: true },
+		title: { type: String, required: true },
+		description: { type: String },
+		notes: { type: String },
+		categoryId: { type: String, required: true, index: true },
+		projectId: { type: String, index: true },
+		tags: { type: [String], default: [] },
+
+		status: {
+			type: String,
+			enum: ["pending", "in-progress", "completed", "archived"],
+			default: "pending",
+			index: true,
+		},
+
+		priority: {
+			type: String,
+			enum: ["low", "medium", "high", "urgent"],
+			default: "medium",
+			index: true,
+		},
+
+		dueDate: { type: Date, index: true },
+		startDate: { type: Date, index: true },
+		createdAt: { type: Date, default: Date.now },
+		updatedAt: { type: Date, default: Date.now },
+		completedAt: { type: Date, index: true },
+
+		subtasks: { type: [subtaskSchema], default: [] },
+
+		estimatedDuration: { type: Number },
+		actualDuration: { type: Number },
+		reminderDate: { type: Date, index: true },
+	},
+	{
+		statics: {
+			async getStatsByUserId(userId: string): Promise<TaskStats> {
+				const now = new Date();
+				const startOfToday = new Date(
+					now.getFullYear(),
+					now.getMonth(),
+					now.getDate()
+				);
+				const startOfWeek = new Date(now);
+				startOfWeek.setDate(now.getDate() - now.getDay());
+				startOfWeek.setHours(0, 0, 0, 0);
+
+				const [stats] = await this.aggregate([
+					{ $match: { userId } },
+					{
+						$facet: {
+							total: [{ $count: "count" }],
+							completed: [
+								{ $match: { status: "completed" } },
+								{ $count: "count" },
+							],
+							overdue: [
+								{
+									$match: {
+										status: { $ne: "completed" },
+										dueDate: { $lt: now },
+									},
+								},
+								{ $count: "count" },
+							],
+							completedToday: [
+								{
+									$match: {
+										status: "completed",
+										completedAt: { $gte: startOfToday },
+									},
+								},
+								{ $count: "count" },
+							],
+							completedThisWeek: [
+								{
+									$match: {
+										status: "completed",
+										completedAt: { $gte: startOfWeek },
+									},
+								},
+								{ $count: "count" },
+							],
+							pending: [{ $match: { status: "pending" } }, { $count: "count" }],
+							inProgress: [
+								{ $match: { status: "in-progress" } },
+								{ $count: "count" },
+							],
+						},
+					},
+				]);
+
+				const totalTasks = stats.total[0]?.count || 0;
+				const completedTasks = stats.completed[0]?.count || 0;
+
+				return {
+					userId,
+					totalTasks,
+					completedTasks,
+					overdueTasks: stats.overdue[0]?.count || 0,
+					completedToday: stats.completedToday[0]?.count || 0,
+					completedThisWeek: stats.completedThisWeek[0]?.count || 0,
+					pendingTasks: stats.pending[0]?.count || 0,
+					inProgressTasks: stats.inProgress[0]?.count || 0,
+					completionRate:
+						totalTasks > 0
+							? Math.round((completedTasks / totalTasks) * 100)
+							: 0,
+				};
+			},
+		},
+		timestamps: true,
+	}
+);
+
+taskSchema.index({ userId: 1, status: 1 });
+taskSchema.index({ userId: 1, dueDate: 1 });
+taskSchema.index({ userId: 1, priority: 1 });
+
+const categorySchema = new Schema<Category>(
+	{
+		id: { type: String, required: true, default: () => crypto.randomUUID() },
+		userId: { type: String, required: true, index: true },
+		name: { type: String, required: true },
+		color: { type: String, required: true },
+		icon: { type: String },
+		isDefault: { type: Boolean, default: false },
+		createdAt: { type: Date, default: Date.now },
+	},
+	{ timestamps: true }
+);
+
+categorySchema.index({ userId: 1, name: 1 }, { unique: true });
+
+export const Task = model<ITask>("Task", taskSchema);
+export const Category = model<Category>("Category", categorySchema);
+
+export interface IProject {
+	id: string;
+	userId: string;
 	name: string;
 	description?: string;
-	dueDate?: Date;
-	priority?: "Low" | "Medium" | "High";
-	completed: boolean;
-}
-
-export interface ITaskCategory {
-	kind: "Category";
-	categoryName: string;
-	Tasks: ITask[];
-}
-
-export interface ITasks {
-	_id: Types.ObjectId;
-	OwnerUUID: string;
-	categoryName: string;
-	Tasks: ITaskCategory[] | ITask[];
+	color: string;
+	isArchived: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
-export type TasksDocument = HydratedDocument<ITasks>;
+const projectSchema = new Schema<IProject>(
+	{
+		id: { type: String, required: true, default: () => crypto.randomUUID() },
+		userId: { type: String, required: true, index: true },
+		name: { type: String, required: true },
+		description: { type: String },
+		color: { type: String, required: true },
+		isArchived: { type: Boolean, default: false },
+	},
+	{ timestamps: true }
+);
 
-export interface TasksModel extends Model<ITasks> {
-	findByOwnerUUID(OwnerUUID: string): Promise<TasksDocument[]>;
+projectSchema.index({ userId: 1, name: 1 }, { unique: true });
+
+export const Project = model<IProject>("Project", projectSchema);
+
+export interface IActivityLog {
+	id: string;
+	userId: string;
+	taskId: string;
+	action: "created" | "updated" | "completed" | "deleted" | "archived";
+	details?: string;
+	timestamp: Date;
 }
 
-const taskSubSchema = new Schema<ITask>(
-	{
-		name: { type: String, required: true },
-		description: { type: String, required: false },
-		dueDate: { type: Date, required: false },
-		priority: {
-			type: String,
-			enum: ["Low", "Medium", "High"],
-			required: false,
-		},
-		completed: { type: Boolean, required: true, default: false },
+const activityLogSchema = new Schema<IActivityLog>({
+	id: { type: String, required: true, default: () => crypto.randomUUID() },
+	userId: { type: String, required: true, index: true },
+	taskId: { type: String, required: true },
+	action: {
+		type: String,
+		enum: ["created", "updated", "completed", "deleted", "archived"],
+		required: true,
 	},
-	{ _id: false }
+	details: { type: String },
+	timestamp: { type: Date, default: Date.now, index: true },
+});
+
+activityLogSchema.index({ userId: 1, timestamp: -1 });
+
+export const ActivityLog = model<IActivityLog>(
+	"ActivityLog",
+	activityLogSchema
 );
-
-const taskItemSchema = new Schema(
-	{
-		kind: { type: String, required: true, enum: ["Task", "Category"] },
-		// fields for standalone task
-		name: { type: String },
-		description: { type: String },
-		dueDate: { type: Date },
-		priority: { type: String, enum: ["Low", "Medium", "High"] },
-		completed: { type: Boolean },
-		// fields for category
-		categoryName: { type: String },
-		categoryDescription: {type: String},
-		Tasks: { type: [taskSubSchema], default: undefined },
-	},
-	{ _id: false }
-);
-
-taskItemSchema.path("kind").validate(function (value: string) {
-	if (value === "Task") {
-		return !!(this.name && typeof this.completed === "boolean");
-	}
-	if (value === "Category") {
-		return !!(this.categoryName && Array.isArray(this.Tasks));
-	}
-	return false;
-}, "Invalid task item: must be either a 'task' (name + completed) or a 'category' (categoryName + Tasks array).");
-
-const taskSchema = new Schema<ITasks, TasksModel>(
-	{
-		_id: { type: Schema.Types.ObjectId, auto: true },
-		OwnerUUID: { type: String, required: true, index: true },
-		Tasks: { type: [taskItemSchema], default: [] },
-	},
-	{
-		timestamps: true,
-		statics: {
-			async findByOwnerUUID(OwnerUUID: string): Promise<TasksDocument[]> {
-				const doc = await this.find({ OwnerUUID: OwnerUUID });
-
-				if (!doc) {
-					throw new Error("Could not find Tasks");
-				}
-				return doc;
-			},
-		},
-	}
-);
-
-export const Task = model("Tasks", taskSchema);
