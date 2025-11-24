@@ -172,19 +172,6 @@ export default function Demo() {
 		return cols;
 	}, [filtered]);
 
-	function toggleComplete(taskId: string) {
-		setTasks((prev) =>
-			prev.map((t) =>
-				t.id === taskId
-					? {
-							...t,
-							status: t.status === "completed" ? "in-progress" : "completed",
-						}
-					: t
-			)
-		);
-	}
-
 	function changeStatus(taskId: string, newStatus: Status) {
 		setTasks((prev) =>
 			prev.map((t) =>

@@ -4,10 +4,9 @@ import "./globals.css";
 import { cookies } from "next/headers";
 import { Theme } from "./lib/types/enums";
 import isValidTheme from "./lib/validateTheme";
-import { UserProvider, useUser } from "./components/UserProvider";
+import { UserProvider } from "./components/UserProvider";
 import ThemeToggler from "./components/Header/ThemeToggler";
-import AuthModalHandler from "./components/Header/AuthModalHandler/AuthModalHandler";
-import SessionDropdown from "./components/Header/SessionDropdown";
+
 import HeaderStatefulItems from "./components/Header/HeaderStatefulItems";
 
 /** Fonts to be chosen later */

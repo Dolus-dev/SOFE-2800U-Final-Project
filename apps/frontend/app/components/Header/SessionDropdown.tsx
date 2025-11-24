@@ -7,7 +7,7 @@ import {
 	ChevronUpIcon,
 	UserCircleIcon,
 } from "@heroicons/react/24/solid";
-import Link from "next/link";
+
 import { useState } from "react";
 import { useUser } from "../UserProvider";
 
@@ -24,7 +24,7 @@ export default function SessionDropdown() {
 		setIsOpen(false);
 	});
 
-	const { user, isLoading, logout } = useUser();
+	const { user, logout } = useUser();
 	return (
 		<div
 			className="flex flex-col relative"
