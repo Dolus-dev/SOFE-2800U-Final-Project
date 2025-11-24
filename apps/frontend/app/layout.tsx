@@ -4,10 +4,11 @@ import "./globals.css";
 import { cookies } from "next/headers";
 import { Theme } from "./lib/types/enums";
 import isValidTheme from "./lib/validateTheme";
-import { UserProvider } from "./components/UserProvider";
+import { UserProvider, useUser } from "./components/UserProvider";
 import ThemeToggler from "./components/Header/ThemeToggler";
 import AuthModalHandler from "./components/Header/AuthModalHandler/AuthModalHandler";
 import SessionDropdown from "./components/Header/SessionDropdown";
+import HeaderStatefulItems from "./components/Header/HeaderStatefulItems";
 
 /** Fonts to be chosen later */
 
@@ -23,7 +24,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: "Tick-It - Task Management",
-	description: "Keep trasck of your work from anywhere!",
+	description: "Keep track of your work from anywhere!",
 };
 
 export default async function RootLayout({
@@ -54,8 +55,8 @@ export default async function RootLayout({
 						<div className="absolute -top-1 left-4">
 							<ThemeToggler />
 						</div>
-						<AuthModalHandler />
-						<SessionDropdown />
+
+						<HeaderStatefulItems />
 					</header>
 
 					{/* Main content - changes per page */}

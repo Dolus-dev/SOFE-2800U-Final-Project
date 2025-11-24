@@ -6,6 +6,7 @@ import { Email, Password } from "@repo/types";
 import Modal from "../../Modal";
 import useSWRMutation from "swr/mutation";
 import { isValidEmail } from "@/app/lib/authValidations";
+import { useUser } from "../../UserProvider";
 
 type LoginResponse = {
 	success: boolean;
@@ -81,7 +82,7 @@ export default function LoginModal() {
 	const [emailValid, setEmailValid] = useState<null | true | false>(null);
 	const [credentialError, setCredentialError] = useState<string | null>(null);
 	const [passwordError, setPasswordError] = useState<string | null>(null);
-	const [login, setLogin] = useState<{
+	const [loginState, setLoginState] = useState<{
 		username: string;
 		email: Email | string;
 		pass: string;
@@ -99,7 +100,7 @@ export default function LoginModal() {
 			case "username/email":
 				const isEmail = input.includes("@");
 
-				setLogin((prev) => ({
+				setLoginState((prev) => ({
 					...prev,
 					username: "",
 					email: input,
@@ -111,7 +112,7 @@ export default function LoginModal() {
 
 				break;
 			case "password":
-				setLogin((prev) => ({
+				setLoginState((prev) => ({
 					...prev,
 					pass: input.trim(),
 				}));
@@ -119,6 +120,7 @@ export default function LoginModal() {
 		}
 	};
 
+	const { login } = useUser();
 	return (
 		<>
 			<motion.button
@@ -173,6 +175,12 @@ export default function LoginModal() {
 								if (result?.success) {
 									// Close modal on success
 									setIsOpen(false);
+									const userDetail = {
+										UUID: result.user?.UUID as string,
+										username: result.user?.username as string,
+										email: result.user?.email as Email,
+									};
+									login(userDetail);
 									console.log("User logged in:", result.user);
 									// Optional: redirect or show success message
 								}
@@ -194,7 +202,9 @@ export default function LoginModal() {
 							<label htmlFor="username/email">Username/Email:</label>
 							<input
 								type="text"
-								value={login.username ? login.username : login.email}
+								value={
+									loginState.username ? loginState.username : loginState.email
+								}
 								id="username/email"
 								name="username/email"
 								onChange={(e) => handleFormChange(e.target)}

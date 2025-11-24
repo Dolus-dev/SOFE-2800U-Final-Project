@@ -1,5 +1,5 @@
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
-import Demo from "./components/demo/demo";
+import Demo from "./components/demo/Demo";
 import BouncingArrow from "./components/animations/bouncingArrow";
 
 export default function Home() {
@@ -35,7 +35,7 @@ export default function Home() {
 			</div>
 			<hr className="bg-lightSecondary dark:bg-darkSecondary border-0 h-0.5 w-full mb-16 transition-colors duration-500" />
 
-			<div className="mt-10">
+			<div className="mt-10 w-full">
 				<Demo />
 			</div>
 		</div>

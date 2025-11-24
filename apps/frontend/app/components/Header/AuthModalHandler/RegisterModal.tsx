@@ -127,7 +127,7 @@ export default function RegisterModal() {
 		<>
 			<motion.button
 				onClick={() => setIsOpen(true)}
-				className="py-3 hover:cursor-pointer transition-colors duration-500 font-semibold hover:text-lightTextMuted active:text-lightTextMuted"
+				className="py-3 hover:cursor-pointer transition-colors mr-6 duration-500 font-semibold hover:text-lightTextMuted active:text-lightTextMuted"
 				whileTap={{ scale: 0.9 }}>
 				Register
 			</motion.button>
@@ -196,6 +196,8 @@ export default function RegisterModal() {
 								const result = await trigger({ ...parsedFormData });
 
 								console.log(result);
+
+								window.location.reload();
 							} catch (error) {
 								console.error("Registration error:", error);
 

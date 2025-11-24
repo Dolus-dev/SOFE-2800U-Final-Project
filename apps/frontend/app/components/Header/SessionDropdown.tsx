@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { useState } from "react";
+import { useUser } from "../UserProvider";
 
 // TODO: Change output depending on whether is logged in based on fetch call
 // Above could be handled either in parent page or locally here
@@ -23,6 +24,7 @@ export default function SessionDropdown() {
 		setIsOpen(false);
 	});
 
+	const { user, isLoading, logout } = useUser();
 	return (
 		<div
 			className="flex flex-col relative"
@@ -31,7 +33,7 @@ export default function SessionDropdown() {
 				className={`overflow-hidden flex flex-row z-10 items-center hover:cursor-pointer py-2 border-b-2 border-b-lightSecondary dark:border-b-darkSecondary transition-colors duration-500`}
 				onClick={() => setIsOpen(!isOpen)}>
 				<UserCircleIcon className="size-8" />
-				<span className="px-2 mr-10 font-semibold">Test User</span>
+				<span className="px-2 mr-10 font-semibold">{user?.username}</span>
 				<div className={`transition-normal duration-500 `}>
 					<ChevronDownIcon
 						className={`  absolute  top-3 right-1 duration-500   transform ${
@@ -45,12 +47,14 @@ export default function SessionDropdown() {
 			</button>
 			<div
 				className={`flex flex-col absolute overflow-hidden w-full font-semibold justify-center border-b-2 border-b-accent bg-lightSecondary dark:bg-darkSecondary transition-all duration-500 top-full  text-lightText ${isOpen ? "  max-h-[2em]" : " max-h-0 "}  transition-normal duration-500`}>
-				<Link
-					href={"/auth/signout"}
+				<button
+					onClick={async () => {
+						logout();
+					}}
 					className={`flex flex-row justify-center gap-2 hover:text-lightTextMuted  overflow-hidden py-1 transition-all duration-400`}>
 					<ArrowLeftStartOnRectangleIcon className="size-6" />
 					<span>Logout</span>
-				</Link>
+				</button>
 			</div>
 		</div>
 	);
