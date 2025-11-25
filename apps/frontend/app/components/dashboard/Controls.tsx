@@ -6,7 +6,7 @@ import Filter from "../demo/components/Filter";
 import useSWR from "swr";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import Modal from "../Modal";
-import { form } from "motion/react-client";
+
 import { createTask } from "@/app/lib/hooks/tasks";
 
 type SortOptions = {
@@ -28,7 +28,7 @@ export default function Controls() {
 	const [selectedCategory, setSelectedCategory] = useState<string>("");
 	const [newCategoryName, setNewCategoryName] = useState<string>("");
 
-	const { data } = useSWR<{
+	const { data: categoriesData } = useSWR<{
 		success: boolean;
 		categories: string[];
 	}>(
@@ -60,10 +60,9 @@ export default function Controls() {
 			};
 		},
 		{
-			revalidateOnFocus: false,
+			revalidateOnFocus: true,
 			revalidateOnReconnect: false,
 			refreshInterval: 0,
-			revalidateIfStale: false,
 			shouldRetryOnError: false,
 			dedupingInterval: 60 * 60 * 1000,
 		}
@@ -97,7 +96,11 @@ export default function Controls() {
 					label="Category"
 					value={categoryFilter}
 					onChange={(v) => setCategoryFilter(v)}
-					options={data?.categories ? ["all", ...data.categories] : ["all"]}
+					options={
+						categoriesData?.categories
+							? ["all", ...categoriesData.categories]
+							: ["all"]
+					}
 				/>
 				<Filter
 					label="Sort"
@@ -149,20 +152,26 @@ export default function Controls() {
 								title: String(formData.get("task-title")).trim(),
 								description:
 									String(formData.get("task-description")).trim() || undefined,
-								category:
+								categoryName:
 									String(formData.get("task-category")) === "__new__"
 										? formData.get("task-category-new")?.toString().trim()
-										: String(formData.get("task-category")).trim(),
+										: formData.get("task-category")?.toString().trim(),
 								priority: String(
 									formData.get("task-priority")
 								).trim() as Priority,
-								dueDate: new Date(String(formData.get("task-due-date")).trim()),
+								dueDate: String(formData.get("task-due-date")).trim(),
 								status: "pending" as Status,
 							};
 
-							console.log(rawFormData);
+							const result = await createTask(rawFormData);
 
-							await createTask(rawFormData);
+							// Close modal on success
+							if (result.success) {
+								setCategoryMode("existing");
+								setSelectedCategory("");
+								setNewCategoryName("");
+								setShowModal(false);
+							}
 						}}
 						className="flex flex-col gap-4 mx-3 my-2">
 						<div>
@@ -220,14 +229,17 @@ export default function Controls() {
 									}}
 									className="w-full border-2 rounded-md border-black bg-gray-400/20 dark:bg-black/20 px-2 py-1.5 text-lightText dark:text-darkText">
 									<option value="">Select category</option>
-									{(data?.categories || []).map((name) => (
+									{(categoriesData?.categories || []).map((name) => (
 										<option
 											key={name}
-											value={name}>
+											value={name}
+											className="capitalize">
 											{name}
 										</option>
 									))}
-									<option value={"general"}>General</option>
+									{!categoriesData?.categories.find(
+										(name) => name === "general"
+									) && <option value={"general"}>General</option>}
 									<option value="__new__">+ Create Category</option>
 								</select>
 								{categoryMode === "new" && (

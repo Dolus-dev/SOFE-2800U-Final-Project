@@ -1,3 +1,4 @@
+import Columns from "../components/dashboard/Columns";
 import Controls from "../components/dashboard/Controls";
 import Stats from "../components/dashboard/Stats";
 
@@ -8,6 +9,7 @@ export default function DashboardPage() {
 				<div className="mt-6">
 					<Stats />
 					<Controls />
+					<Columns />
 				</div>
 			</main>
 		</div>

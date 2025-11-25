@@ -15,7 +15,7 @@ interface StatsResponse {
 	stats: TaskStats;
 }
 
-const fetcher = async (url: string): Promise<StatsResponse> => {
+const statsFetcher = async (url: string): Promise<StatsResponse> => {
 	const res = await fetch(url, {
 		method: "GET",
 		credentials: "include",
@@ -30,11 +30,13 @@ const fetcher = async (url: string): Promise<StatsResponse> => {
 };
 
 export default function TaskStats() {
-	const { data, error, isLoading } = useSWR<StatsResponse>(
-		["http://localhost:3001/tasks/stats"],
-		fetcher,
-		{ revalidateOnFocus: false }
-	);
+	const {
+		data: statsData,
+		error,
+		isLoading,
+	} = useSWR<StatsResponse>("http://localhost:3001/tasks/stats", statsFetcher, {
+		revalidateOnFocus: false,
+	});
 
 	if (isLoading) {
 		return (
@@ -51,7 +53,7 @@ export default function TaskStats() {
 		);
 	}
 
-	if (error || !data?.success) {
+	if (error || !statsData?.success) {
 		return (
 			<section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
 				<div className="col-span-full rounded-xl p-3 border border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400 text-sm">
@@ -61,7 +63,7 @@ export default function TaskStats() {
 		);
 	}
 
-	const stats = data.stats;
+	const stats = statsData.stats;
 
 	return (
 		<section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">

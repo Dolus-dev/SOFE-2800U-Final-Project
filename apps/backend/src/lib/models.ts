@@ -98,6 +98,7 @@ export interface ITask {
 	categoryId: string;
 	projectId?: string;
 	tags: string[];
+	categoryName: string;
 
 	// Status Tracking
 
@@ -169,6 +170,7 @@ const taskSchema = new Schema<ITask, TaskModel>(
 		title: { type: String, required: true },
 		description: { type: String },
 		categoryId: { type: String, required: true, index: true },
+		categoryName: { type: String, required: true },
 
 		status: {
 			type: String,
@@ -214,60 +216,5 @@ const categorySchema = new Schema<Category>(
 categorySchema.index({ userId: 1, name: 1 }, { unique: true });
 
 export const Task = model<ITask>("Task", taskSchema);
+
 export const Category = model<Category>("Category", categorySchema);
-
-export interface IProject {
-	id: string;
-	userId: string;
-	name: string;
-	description?: string;
-	color: string;
-	isArchived: boolean;
-	createdAt: Date;
-	updatedAt: Date;
-}
-
-const projectSchema = new Schema<IProject>(
-	{
-		id: { type: String, required: true, default: () => crypto.randomUUID() },
-		userId: { type: String, required: true, index: true },
-		name: { type: String, required: true },
-		description: { type: String },
-		color: { type: String, required: true },
-		isArchived: { type: Boolean, default: false },
-	},
-	{ timestamps: true }
-);
-
-projectSchema.index({ userId: 1, name: 1 }, { unique: true });
-
-export const Project = model<IProject>("Project", projectSchema);
-
-export interface IActivityLog {
-	id: string;
-	userId: string;
-	taskId: string;
-	action: "created" | "updated" | "completed" | "deleted" | "archived";
-	details?: string;
-	timestamp: Date;
-}
-
-const activityLogSchema = new Schema<IActivityLog>({
-	id: { type: String, required: true, default: () => crypto.randomUUID() },
-	userId: { type: String, required: true, index: true },
-	taskId: { type: String, required: true },
-	action: {
-		type: String,
-		enum: ["created", "updated", "completed", "deleted", "archived"],
-		required: true,
-	},
-	details: { type: String },
-	timestamp: { type: Date, default: Date.now, index: true },
-});
-
-activityLogSchema.index({ userId: 1, timestamp: -1 });
-
-export const ActivityLog = model<IActivityLog>(
-	"ActivityLog",
-	activityLogSchema
-);

@@ -2,7 +2,7 @@ import { mutate } from "swr";
 
 const TASKS_STATS_URL = "http://localhost:3001/tasks/stats";
 const TASKS_URL = "http://localhost:3001/tasks";
-const TASKS_CATEGORIES = "http://localhost:3001/tasks/categories";
+const TASKS_CATEGORIES = "http://localhost:3001/tasks/catagories";
 
 function refreshTaskData() {
 	mutate(TASKS_STATS_URL);
@@ -13,10 +13,10 @@ function refreshTaskData() {
 export async function createTask(taskData: {
 	title: string;
 	description?: string;
-	categoryId?: string;
+	categoryName?: string;
 	priority: "low" | "medium" | "high" | "urgent";
 	status: "pending" | "in-progress" | "completed";
-	dueDate?: Date;
+	dueDate?: string;
 }) {
 	const res = await fetch(TASKS_URL, {
 		method: "POST",
@@ -37,7 +37,7 @@ export async function updateTask(
 	taskId: string,
 	updates: Partial<{
 		title: string;
-		userId: string;
+
 		description: string;
 		categoryId: string;
 		priority: "low" | "medium" | "high" | "urgent";
