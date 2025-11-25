@@ -146,12 +146,9 @@ export interface TaskStats {
 	userId: string;
 	totalTasks: number;
 	completedTasks: number;
-	overdueTasks: number;
-	completedToday: number;
-	completedThisWeek: number;
+
 	pendingTasks: number;
 	inProgressTasks: number;
-	completionRate: number; // percentage
 }
 
 export interface TaskModel extends Model<ITask> {
@@ -171,14 +168,11 @@ const taskSchema = new Schema<ITask, TaskModel>(
 		userId: { type: String, required: true, index: true },
 		title: { type: String, required: true },
 		description: { type: String },
-		notes: { type: String },
 		categoryId: { type: String, required: true, index: true },
-		projectId: { type: String, index: true },
-		tags: { type: [String], default: [] },
 
 		status: {
 			type: String,
-			enum: ["pending", "in-progress", "completed", "archived"],
+			enum: ["pending", "in-progress", "completed"],
 			default: "pending",
 			index: true,
 		},
@@ -191,94 +185,11 @@ const taskSchema = new Schema<ITask, TaskModel>(
 		},
 
 		dueDate: { type: Date, index: true },
-		startDate: { type: Date, index: true },
 		createdAt: { type: Date, default: Date.now },
 		updatedAt: { type: Date, default: Date.now },
 		completedAt: { type: Date, index: true },
-
-		subtasks: { type: [subtaskSchema], default: [] },
-
-		estimatedDuration: { type: Number },
-		actualDuration: { type: Number },
-		reminderDate: { type: Date, index: true },
 	},
 	{
-		statics: {
-			async getStatsByUserId(userId: string): Promise<TaskStats> {
-				const now = new Date();
-				const startOfToday = new Date(
-					now.getFullYear(),
-					now.getMonth(),
-					now.getDate()
-				);
-				const startOfWeek = new Date(now);
-				startOfWeek.setDate(now.getDate() - now.getDay());
-				startOfWeek.setHours(0, 0, 0, 0);
-
-				const [stats] = await this.aggregate([
-					{ $match: { userId } },
-					{
-						$facet: {
-							total: [{ $count: "count" }],
-							completed: [
-								{ $match: { status: "completed" } },
-								{ $count: "count" },
-							],
-							overdue: [
-								{
-									$match: {
-										status: { $ne: "completed" },
-										dueDate: { $lt: now },
-									},
-								},
-								{ $count: "count" },
-							],
-							completedToday: [
-								{
-									$match: {
-										status: "completed",
-										completedAt: { $gte: startOfToday },
-									},
-								},
-								{ $count: "count" },
-							],
-							completedThisWeek: [
-								{
-									$match: {
-										status: "completed",
-										completedAt: { $gte: startOfWeek },
-									},
-								},
-								{ $count: "count" },
-							],
-							pending: [{ $match: { status: "pending" } }, { $count: "count" }],
-							inProgress: [
-								{ $match: { status: "in-progress" } },
-								{ $count: "count" },
-							],
-						},
-					},
-				]);
-
-				const totalTasks = stats.total[0]?.count || 0;
-				const completedTasks = stats.completed[0]?.count || 0;
-
-				return {
-					userId,
-					totalTasks,
-					completedTasks,
-					overdueTasks: stats.overdue[0]?.count || 0,
-					completedToday: stats.completedToday[0]?.count || 0,
-					completedThisWeek: stats.completedThisWeek[0]?.count || 0,
-					pendingTasks: stats.pending[0]?.count || 0,
-					inProgressTasks: stats.inProgress[0]?.count || 0,
-					completionRate:
-						totalTasks > 0
-							? Math.round((completedTasks / totalTasks) * 100)
-							: 0,
-				};
-			},
-		},
 		timestamps: true,
 	}
 );

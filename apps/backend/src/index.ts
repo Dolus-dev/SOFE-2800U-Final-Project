@@ -13,7 +13,7 @@ app.use(
 	cors({
 		/**Allows us to send data from backend to frontend when requested */
 		credentials: true,
-		origin: "http://localhost:3000",
+		origin: ["http://localhost:3000", "http://localhost"],
 	})
 );
 app.use(express.json());

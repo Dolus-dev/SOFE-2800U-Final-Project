@@ -19,6 +19,15 @@ export function verifyToken(token: string): JWTPayload | null {
 		return null;
 	}
 }
+
+export function decodeToken(token: string): JWTPayload | null {
+	try {
+		return jwt.decode(token) as JWTPayload;
+	} catch (error) {
+		return null;
+	}
+}
+
 export function setSessionToken(res: Response, payload: JWTPayload): void {
 	const token = generateToken(payload);
 

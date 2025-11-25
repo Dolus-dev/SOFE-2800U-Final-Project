@@ -6,8 +6,8 @@ import Filter from "./components/Filter";
 import Modal from "../Modal";
 import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
-type Status = "pending" | "in-progress" | "completed";
-type Priority = "low" | "medium" | "high" | "urgent";
+export type Status = "pending" | "in-progress" | "completed";
+export type Priority = "low" | "medium" | "high" | "urgent";
 
 type Task = {
 	id: string;
