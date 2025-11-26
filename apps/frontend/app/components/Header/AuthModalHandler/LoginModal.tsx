@@ -7,6 +7,7 @@ import Modal from "../../Modal";
 import useSWRMutation from "swr/mutation";
 import { isValidEmail } from "@/app/lib/authValidations";
 import { useUser } from "../../UserProvider";
+import { redirect } from "next/navigation";
 
 type LoginResponse = {
 	success: boolean;
@@ -183,6 +184,7 @@ export default function LoginModal() {
 									login(userDetail);
 									console.log("User logged in:", result.user);
 									// Optional: redirect or show success message
+									window.location.href = "/dashboard";
 								}
 							} catch (error) {
 								console.error("Login error:", error);

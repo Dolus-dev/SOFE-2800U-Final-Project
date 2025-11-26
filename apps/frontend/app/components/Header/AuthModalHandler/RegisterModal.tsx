@@ -197,7 +197,7 @@ export default function RegisterModal() {
 
 								console.log(result);
 
-								window.location.reload();
+								window.location.href = "/dashboard";
 							} catch (error) {
 								console.error("Registration error:", error);
 

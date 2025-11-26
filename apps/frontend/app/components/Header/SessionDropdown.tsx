@@ -50,6 +50,7 @@ export default function SessionDropdown() {
 				<button
 					onClick={async () => {
 						logout();
+						window.location.href = "/";
 					}}
 					className={`flex flex-row justify-center gap-2 hover:text-lightTextMuted  overflow-hidden py-1 transition-all duration-400`}>
 					<ArrowLeftStartOnRectangleIcon className="size-6" />
