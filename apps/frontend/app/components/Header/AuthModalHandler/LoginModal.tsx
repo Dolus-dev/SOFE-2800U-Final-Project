@@ -7,7 +7,6 @@ import Modal from "../../Modal";
 import useSWRMutation from "swr/mutation";
 import { isValidEmail } from "@/app/lib/authValidations";
 import { useUser } from "../../UserProvider";
-import { redirect } from "next/navigation";
 
 type LoginResponse = {
 	success: boolean;
