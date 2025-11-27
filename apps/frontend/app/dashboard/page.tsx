@@ -7,7 +7,15 @@ import Stats from "../components/dashboard/Stats";
 import { useUser } from "../components/UserProvider";
 
 export default function DashboardPage() {
-	const { user } = useUser();
+	const { user, isLoading } = useUser();
+
+	if (isLoading) {
+		return (
+			<div className="text-lightText dark:text-darkText min-h-250">
+				Loading...
+			</div>
+		);
+	}
 
 	if (!user) {
 		redirect("/");
